@@ -13,16 +13,16 @@ import java.util.Arrays;
  */
 public class IterationK {
 
-    private final Double[] arr;
-    private Double[] res;
-    private final Double[] thetaI;
+    private final Double[] arr; // array of sorted antipodes
+    private Double[] res; // result of merging arr and thetaI
+    private final Double[] thetaI; // sorted array pf polar angles of color i
     private final int totalLen;
     private final int ni;
-    private int[] pointer;
-    private int[] counts;
+    private int[] pointer; // indicates the position of thetaI[j] in res
+    private int[] counts; // the number of points in res in the interval between thetaI[j] and thetaI[j + 1]
     private int[] lastInd;
-    private int[] sumPrefix;
-    private int[] tSumPrefix;
+    private int[] sumPrefix; // prefix sum array of counts
+    private int[] tSumPrefix; // prefix sum array of sumPrefix
 
     IterationK(Double[] A, Double[] thetaI) {
         this.arr = A;
@@ -46,7 +46,7 @@ public class IterationK {
                 res[k] = arr[i++];
             } else {
                 res[k] = thetaI[j]; // if equal theta comes first
-                pointer[j] = k;
+                pointer[j] = k; // remember the position
                 j++;
             }
 
