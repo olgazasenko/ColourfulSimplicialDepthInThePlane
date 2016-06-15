@@ -6,6 +6,7 @@ by Liu, to a colourful case. More specifically, each data point in a set is assi
 We form colourful triangles from these points (all three vertices have different colours), and count
 in how many of this triangles our point of interest is contained. For convenience, we chose
 to compute the depth of <strong>x = (0, 0)</strong>.
+
 Our algorithm builds up on those introduced by Rousseeuw and Ruts in "Bivariate Location Depth",
 and Gil, Steiger, and Wigderson in "Geometric Medians". The overall running time is <strong>O(n log n + kn)</strong>,
 where k is the number of colours, and n is the number of data points. The space required is <strong>O(n)</strong>.
