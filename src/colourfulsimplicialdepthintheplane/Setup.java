@@ -23,7 +23,7 @@ public class Setup {
     Scanner in = null;
 
     protected ArrayList<Point2D.Double[]> colourSets;
-    protected ArrayList<Double[]> thetas;
+    protected ArrayList<Double[]> thetas; // polar angles with respect to (0, 0)
     protected ArrayList<Double[]> antipodes;
     int[] sizes; // individual sizes of the arrays
     int n; // total num of points
@@ -32,14 +32,14 @@ public class Setup {
 
     Double[] A; // sorted array of all antipodes
     long depth; // monochrome depth with respect to all n points
-    long sum1 = 0;
-    long sum2 = 0;
+    long sum1 = 0; // number of triangles with all three vertices of the same color that contain (0, 0)
+    long sum2 = 0; // number of triangles with two or more vertices of the same color
 
         Setup(boolean random) {
 
         Random rand = new Random();
         if (random) {
-            k = 6; // rand.nextInt((maxCol - min) + 1) + min;
+            k = rand.nextInt((8 - 3) + 1) + 3; // k >= 3
         } else {
             try {
                 in = new Scanner(new FileReader("E:\\Documents\\NetBeansProjects\\"
@@ -53,12 +53,13 @@ public class Setup {
                 System.exit(0);
             }
         }
+        // initialize all the arrays
         colourSets = new ArrayList<>(k);
         thetas = new ArrayList<>(k);
         antipodes = new ArrayList<>(k);
-
         sizes = new int[k];
         lastInd0 = new int[k];
+        
         if (random) {
             randomData(rand);
         } else {
@@ -68,7 +69,8 @@ public class Setup {
 
 private final void randomData(Random rand) {
 
-        int max = 2000, min = 1970;
+        // bounds on the number of points of each color
+        int max = 200, min = 170;
         PrintWriter writer = null;
         try {
             writer = new PrintWriter("E:\\Documents\\NetBeansProjects\\"
@@ -77,10 +79,12 @@ private final void randomData(Random rand) {
             Logger.getLogger(Setup.class.getName()).log(Level.SEVERE, null, ex);
         }
         writer.println(String.valueOf(k));
-        int minCoord = -300, maxCoord = 300, ni;
+        int minCoord = -300, maxCoord = 300;
+        int ni; // number of points of color i
+        
         for (int i = 0; i < k; i++) {
             ni = rand.nextInt((max - min) + 1) + min;
-            writer.println(String.valueOf(ni));
+            writer.println(String.valueOf(ni)); // write to file
             sizes[i] = ni;
             n += ni;
 
@@ -95,6 +99,7 @@ private final void randomData(Random rand) {
                 colourSets.get(i)[j] = new Point2D.Double(x, y);
                 double theta = Math.toDegrees(Math.atan2(y, x));
 
+                // all the angles are in [0, 360)
                 if (theta < 0) {
                     thetas.get(i)[j] = theta + 360;
                 } else {
@@ -107,6 +112,7 @@ private final void randomData(Random rand) {
         writer.close();
     }
 
+    // reads from file
     private final void initialize() {
 
         int i = 0;
@@ -138,11 +144,15 @@ private final void randomData(Random rand) {
         }
     }
 
+    /*
+    * sort both arrays of angles and antipodes of color i
+    */
     private void sortCol(int i) {
         Arrays.sort(thetas.get(i));
         Arrays.sort(antipodes.get(i));
     }
 
+    // comute sum1 and depth
     protected void firstPart() {
         for (int i = 0; i < k; i++) {
             sum1 += RousseeuwAndRuts.computeDepth(thetas.get(i));
@@ -154,6 +164,7 @@ private final void randomData(Random rand) {
         paint.paint();
     }
 
+    // there are k iteratoins in total, one for each color
     protected void runIterationK(int iteration) {
 
         IterationK itK = new IterationK(A, thetas.get(iteration));
