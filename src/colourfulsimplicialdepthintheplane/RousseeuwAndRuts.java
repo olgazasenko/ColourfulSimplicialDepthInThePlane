@@ -11,26 +11,24 @@ import java.util.Arrays;
  *
  * @author Olga
  *
- * computes the monochrome simplicial depth alpha is a sorted array of polar
- * angles alpha[i] in [0, 2*pi)
+ * RousseeuwAndRuts computes the monochrome simplicial depth in O(n log n) time
+ * alpha is a sorted array of polar
+ * angles alpha[i] in [0, 360)
  */
 public class RousseeuwAndRuts {
 
     private static int len = 0;
-    private static int doubleLen;
-    private static double[] alpha1;
-    private static double[] beta;
+    private static int doubleLen; // = 2 * len
+    private static double[] alpha1; // alpha1[i] = alpha[i] - alpha[0], for all i
+    private static double[] beta; // antipodes of alpha1
     private static double[] gamma; // common sorted array
-    private static int[] w; // 
+    private static int[] w; // indicates whether gamma[i] belonged to alpha1 or beta
     protected static int NU; // number of alphas in the semicircle of alpha1[0] inclusive
 
     /**
      *
      * @param alpha
-     * 
-     * let alpha1[0] = 0, alpha1[i] = alpha[i] - alpha[0]
-           let beta[i] = (alpha1[i] + pi) mod 2*pi
-           sort beta
+     *
      */
     private static boolean fillAlphaBeta(Double[] alpha) {
 
