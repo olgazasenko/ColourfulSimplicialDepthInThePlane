@@ -13,7 +13,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
 # ColourfulSimplicialDepthInThePlane
 
-This algorithm was developed for the paper "Computing Colourful Simplicial Depth in the Plane"
+This project is an implementation of the algorithm developed as part of the paper 
+"Computing Colourful Simplicial Depth in the Plane"
 by O. Zasenko and T. Stephen. It extends the notion of simplicial depth, first introduced
 by Liu, to a colourful case. More specifically, each data point in a set is assigned its own colour.
 We form colourful triangles from these points (all three vertices have different colours), and count
@@ -22,7 +23,8 @@ to compute the depth of <strong>x = (0, 0)</strong>.
 
 Our algorithm builds up on those introduced by Rousseeuw and Ruts in "Bivariate Location Depth",
 and Gil, Steiger, and Wigderson in "Geometric Medians". The overall running time is <strong>O(n log n + kn)</strong>,
-where k is the number of colours, and n is the number of data points. The space required is <strong>O(n)</strong>.
+where <strong>k</strong> is the number of colours, and <strong>n</strong> is the number of data points. 
+The space required is <strong>O(n)</strong>.
 Points can either be read from file, or generated randomly. But we do require them to be in general position.
 The minimal number of colours is 3, in order to have at least one colourful triangle.
 
