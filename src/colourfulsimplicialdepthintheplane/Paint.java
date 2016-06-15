@@ -6,6 +6,8 @@ package colourfulsimplicialdepthintheplane;
 
 import java.applet.Applet;
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import org.math.plot.Plot2DPanel;
@@ -14,50 +16,42 @@ import org.math.plot.Plot2DPanel;
  *
  * @author Olga
  */
-public  class Paint extends Applet{
+public class Paint extends Applet {
+
     Graphics2D g2;
-    float[] gamma;
-    int[] w;
+    ArrayList<Point2D.Double[]> colourSets;
     Plot2DPanel plot;
-    
-    
-    Paint(float[] gamma, int[] w){
-        this.gamma = gamma;
-        this.w = w;
+
+    Paint(ArrayList<Point2D.Double[]> colourSets) {
+        this.colourSets = colourSets;
         JFrame frame = new JFrame("a plot panel");
         frame.setSize(700, 700);
         plot = new Plot2DPanel();
-        plot.setFixedBounds(0, -5, 15);
-        plot.setFixedBounds(1, -5, 30);
         frame.setContentPane(plot);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
-    
-    public void paint(){
-         paintPoints();
-         
+
+    public void paint() {
+        paintPoints();
+
     }
-    
-    private void paintPoints(){
-        int n = gamma.length;
-        double[][] alpha = new double[n/2][2];
-        double[][] beta = new double[n/2][2];
-        int j = 0;
-        int k = 0;
-        for (int i = 0; i < n; i++){
-            if (w[i] == 1){
-                alpha[j][0] = Math.cos(Math.toRadians(gamma[i]));
-                alpha[j][1] = Math.sin(Math.toRadians(gamma[i]));
-                j++;
+
+    private void paintPoints() {
+
+        int k = colourSets.size();
+        Color[] colors = {Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA,
+            Color.ORANGE, Color.PINK, Color.RED, Color.YELLOW};
+        for (int i = 0; i < k; i++) {
+            int ni = colourSets.get(i).length;
+            double[][] points = new double[ni][2];
+            for (int j = 0; j < ni; j++) {
+                points[j][0] = colourSets.get(i)[j].x;
+                points[j][1] = colourSets.get(i)[j].y;
             }
-            else {
-                beta[k][0] = Math.cos(Math.toRadians(gamma[i]));
-                beta[k][1] = Math.sin(Math.toRadians(gamma[i]));
-                k++;
-            }
+            plot.addScatterPlot("plot", colors[i], points);
         }
-        plot.addScatterPlot("plot", Color.BLUE, alpha);
-        plot.addScatterPlot("plot", Color.GREEN, beta);
+        double[][] points = {{0}, {0}};
+        plot.addScatterPlot("plot", Color.BLACK, points);
     }
 }

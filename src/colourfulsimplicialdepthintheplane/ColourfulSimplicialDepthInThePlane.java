@@ -16,12 +16,17 @@ public class ColourfulSimplicialDepthInThePlane {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        float[] alpha = {30, 50, 120, 170, 210, 270};
+        /* float[] alpha = {30, 50, 120, 170, 210, 270};
         RousseeuwAndRuts rousseeuwRuts = new RousseeuwAndRuts(alpha);
         int monochromeDepth = rousseeuwRuts.computeDepth();
-        System.out.println(monochromeDepth);
+        System.out.println(monochromeDepth);*/
 
+        long startTime = System.currentTimeMillis();
+        boolean random = true;
+        Setup setup = new Setup(random);
+        setup.firstPart();
+        System.out.println("CSD(0, 0) = " + setup.colourfulSimplicialDepth());
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total time = " + (endTime - startTime));
     }
-
-    
 }
