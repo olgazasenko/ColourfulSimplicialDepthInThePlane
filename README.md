@@ -14,8 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # ColourfulSimplicialDepthInThePlane
 
 This project is an implementation of the algorithm developed as part of the paper 
-"Computing Colourful Simplicial Depth in the Plane"
-by O. Zasenko and T. Stephen. It extends the notion of simplicial depth, first introduced
+in progress by O. Zasenko and T. Stephen. It extends the notion of simplicial depth, first introduced
 by Liu, to a colourful case. More specifically, each data point in a set is assigned its own colour.
 We form colourful triangles from these points (all three vertices have different colours), and count
 in how many of this triangles our point of interest is contained. For convenience, we chose
