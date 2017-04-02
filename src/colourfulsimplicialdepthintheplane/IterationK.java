@@ -1,19 +1,7 @@
 /*
- * This file is part of ColourfulSimplicialDepthInThePlane project.
-
-    ColourfulSimplicialDepthInThePlane is free software: you can redistribute 
-    it and/or modify it under the terms of the GNU General Public License 
-    as published by the Free Software Foundation, either version 3 of the License, 
-    or (at your option) any later version.
-
-    ColourfulSimplicialDepthInThePlane is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with ColourfulSimplicialDepthInThePlane. 
-    If not, see <http://www.gnu.org/licenses/>.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package colourfulsimplicialdepthintheplane;
 
@@ -25,16 +13,17 @@ import java.util.Arrays;
  */
 public class IterationK {
 
-    private final Double[] arr; // array of sorted antipodes
-    private Double[] res; // result of merging arr and thetaI
-    private final Double[] thetaI; // sorted array pf polar angles of color i
+    private final Double[] arr;
+    private Double[] res;
+    private int[] w;
+    private final Double[] thetaI;
     private final int totalLen;
     private final int ni;
-    private int[] pointer; // indicates the position of thetaI[j] in res
-    private int[] counts; // the number of points in res in the interval between thetaI[j] and thetaI[j + 1]
+    private int[] pointer;
+    private int[] counts;
     private int[] lastInd;
-    private int[] sumPrefix; // prefix sum array of counts
-    private int[] tSumPrefix; // prefix sum array of sumPrefix
+    private int[] sumPrefix;
+    private int[] tSumPrefix;
 
     IterationK(Double[] A, Double[] thetaI) {
         this.arr = A;
@@ -50,15 +39,18 @@ public class IterationK {
     protected void mergeTwoSortedArrays() {
 
         res = new Double[totalLen];
+        w = new int[totalLen];
         pointer = new int[ni];
         int i = 0, j = 0, k = 0;
 
         while (i < arr.length && j < ni) {
             if (arr[i] < thetaI[j]) {
                 res[k] = arr[i++];
+                w[k] = -1;
             } else {
                 res[k] = thetaI[j]; // if equal theta comes first
-                pointer[j] = k; // remember the position
+                w[k] = 1;
+                pointer[j] = k;
                 j++;
             }
 
@@ -66,15 +58,23 @@ public class IterationK {
         }
 
         while (i < arr.length) {
-            res[k++] = arr[i++];
+            res[k] = arr[i];
+            w[k] = -1;
+            i++;
+            k++;
         }
 
         while (j < ni) {
             res[k] = thetaI[j];
+            w[k] = 1;
             pointer[j] = k;
             j++;
             k++;
         }
+        System.out.println("thetaI: " + Arrays.toString(thetaI));
+        System.out.println("B: " + Arrays.toString(res));
+        System.out.println("w: " + Arrays.toString(w));
+        System.out.println("pointer: " + Arrays.toString(pointer));
     }
 
     protected void fillCounts() {
@@ -86,24 +86,27 @@ public class IterationK {
                 counts[0] = 0;
                 break;
             }
-            int jMod = j, jMinus = j - 1;
+            int jMod = j;
             if (j == ni) {
                 jMod = 0;
             }
-            double angle = thetaI[jMod] - thetaI[jMinus];
+            double angle = thetaI[jMod] - thetaI[j - 1];
             if (angle < 0) {
                 angle += 360;
             }
-            // the latter condition is for small arrays
             if (angle >= 180 || (angle == 0 && jMod != j + 1)) {
                 counts[jMod] = 0;
             } else {
-                counts[jMod] = pointer[jMod] - pointer[jMinus] - 1;
-                if (pointer[jMod] < pointer[jMinus]) {
+                counts[jMod] = pointer[jMod] - pointer[j - 1] - 1;
+                if (pointer[jMod] < pointer[j - 1]) {
                     counts[jMod] += totalLen;
                 }
             }
+            if (pointer[jMod] == pointer[j - 1]) {
+                System.out.println("THIS SHOULD NOT HAPPEN!");
+            }
         }
+        System.out.println("Counts: " + Arrays.toString(counts));
     }
 
     /* take first index as an argument
@@ -144,18 +147,18 @@ public class IterationK {
                 lastInd[i] += ni;
             }
 
-            int iMinus = i - 1;
-            sumPrefix[i] = sumPrefix[iMinus] + counts[i];
-            tSumPrefix[i] = tSumPrefix[iMinus] + sumPrefix[i];
+            sumPrefix[i] = sumPrefix[i - 1] + counts[i];
+            tSumPrefix[i] = tSumPrefix[i - 1] + sumPrefix[i];
         }
+        System.out.println("LastInd: " + Arrays.toString(lastInd));
+        System.out.println("S: " + Arrays.toString(sumPrefix));
+        System.out.println("T: " + Arrays.toString(tSumPrefix));
     }
 
     protected long getFormulaValue() {
-        long depthI = 0;
+        int depthI = 0;
         int temp;
-        int niMinus1 = ni - 1;
-        
-        for (int j = 0; j < niMinus1; j++) {
+        for (int j = 0; j < ni - 1; j++) {
             if (j == lastInd[j]) {
                 continue; // !!!
             }
@@ -163,22 +166,62 @@ public class IterationK {
             if (temp < 0) {
                 temp += ni;
             }
-            depthI += tSumPrefix[lastInd[j]] - tSumPrefix[j] - temp * sumPrefix[j]; 
+            depthI += tSumPrefix[lastInd[j]] - tSumPrefix[j] - temp * sumPrefix[j]; // OMG
             if (lastInd[j] < (j + 1)) {
                 temp = lastInd[j] + 1; // NO MODULO HERE
                 depthI += tSumPrefix[ni - 1]
                         + sumPrefix[ni - 1] * temp;
             }
         }
-        double angle = thetaI[0] - thetaI[niMinus1];
+        double angle = thetaI[0] - thetaI[ni - 1];
         if (angle < 0) {
             angle += 360;
         }
-        if (angle < 180) { 
-            depthI += tSumPrefix[lastInd[niMinus1]]; // special case, when j = n_i - 1, 
+        if (angle < 180) { // NECCESSARY????
+            depthI += tSumPrefix[lastInd[ni - 1]]; // special case, when j = n_i - 1, 
             // and j + 1 = 0
         }
+        System.out.println("D^i = " + depthI);
         return (depthI);
     }
 
+  /*  private long degenerateTriangles() {
+        int thetas, antipodes, j;
+        long degeneracies = 0;
+        for (int i = 1; i < totalLen; i++) {
+            thetas = 0;
+            antipodes = 0;
+            if (Math.abs(res[i] - res[i - 1]) < EPSILON) {
+                if (w[i - 1] == 1) {
+                        thetas++;
+                    } else {
+                        antipodes++;
+                    }
+                j = i - 1;
+                while (Math.abs(res[j + 1] - res[j]) < EPSILON && (j + 1) < totalLen) {
+                    if (w[j + 1] == 1) {
+                        thetas++;
+                    } else {
+                        antipodes++;
+                    }
+                    j++;
+                }
+                degeneracies += choose(thetas, 2) * antipodes;
+                i = j;
+            } 
+        }
+        return degeneracies;
+    }*/
+
+    /*
+    source:
+    http://stackoverflow.com/questions/15301885/calculate-value-of-n-choose-k
+    
+     */
+   /* private static long choose(int n, int k) {
+        if (k == 0) {
+            return 1;
+        }
+        return (n * choose(n - 1, k - 1)) / k;
+    }*/
 }

@@ -1,18 +1,7 @@
 /*
- * This file is part of ColourfulSimplicialDepthInThePlane project.
-    ColourfulSimplicialDepthInThePlane is free software: you can redistribute 
-    it and/or modify it under the terms of the GNU General Public License 
-    as published by the Free Software Foundation, either version 3 of the License, 
-    or (at your option) any later version.
-    
-    ColourfulSimplicialDepthInThePlane is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    
-    You should have received a copy of the GNU General Public License
-    along with ColourfulSimplicialDepthInThePlane. 
-    If not, see <http://www.gnu.org/licenses/>.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package colourfulsimplicialdepthintheplane;
 
@@ -22,29 +11,28 @@ import java.util.Arrays;
  *
  * @author Olga
  *
- * RousseeuwAndRuts computes the monochrome simplicial depth in O(n log n) time
- * alpha is a sorted array of polar
- * angles alpha[i] in [0, 360)
+ * computes the monochrome simplicial depth alpha is a sorted array of polar
+ * angles alpha[i] in [0, 2*pi)
  */
 public class RousseeuwAndRuts {
 
     private static int len = 0;
-    private static int doubleLen; // = 2 * len
-    private static double[] alpha1; // alpha1[i] = alpha[i] - alpha[0], for all i
-    private static double[] beta; // antipodes of alpha1
+    private static double[] alpha1;
+    private static double[] beta;
     private static double[] gamma; // common sorted array
-    private static int[] w; // indicates whether gamma[i] belonged to alpha1 or beta
+    private static int[] w; // 
     protected static int NU; // number of alphas in the semicircle of alpha1[0] inclusive
 
     /**
      *
      * @param alpha
-     *
      */
     private static boolean fillAlphaBeta(Double[] alpha) {
-
+        /* let alpha1[0] = 0, alpha1[i] = alpha[i] - alpha[0]
+           let beta[i] = (alpha1[i] + pi) mod 2*pi
+           sort beta
+         */
         len = alpha.length;
-        doubleLen = 2 * len;
         NU = 0; 
         alpha1 = new double[len];
         beta = new double[len];
@@ -76,8 +64,8 @@ public class RousseeuwAndRuts {
             System.out.println("The center lies outisde of the data cloud.");
             return false;
         }
-        for (int i = 0; i < (len - 1); i++){
-            if (alpha1[i + 1] - alpha1[i] > 180) {
+        for (int i = 0; i < len; i++){
+            if (i != (len - 1) && (alpha1[i + 1] - alpha1[i] > 180)) {
                 System.out.println("The center lies outisde of the data cloud.");
                 return false;
             }
@@ -93,6 +81,10 @@ public class RousseeuwAndRuts {
             indB++;
             j %= len;
         }
+        System.out.println("alpha: " + Arrays.toString(alpha));
+        System.out.println("alpha1: " + Arrays.toString(alpha1));
+        System.out.println("beta: " + Arrays.toString(beta));
+        System.out.println("NU: " + NU);
         return true;
     }
 
@@ -106,29 +98,36 @@ public class RousseeuwAndRuts {
         if (!fillAlphaBeta(alpha)) { //something went wrong
             return 0;
         }
+
         int start = merge(); //merge alpha and beta into gamma sorted
         // start is the index of the entry right after 180
+        System.out.println("gamma: " + Arrays.toString(gamma));
+        System.out.println("w: " + Arrays.toString(w));
 
         int NF = NU;
         int[] hi = new int[len];
         hi[0] = NU - 1;
 
         int i = start, t = 1;
-        while (t != (len - 1)) { // completed full circle
+        while (i != start - 1) { // completed full circle
             if (w[i] == 1) {
                 NF++;
             } else {
-                hi[t] = NF - (++t); // h(i) = F(i) - i
+                hi[t] = NF - (t + 1); // h(i) = F(i) - i
+                t++;
             }
             i++;
-            i %= doubleLen;
+            i %= 2 * len;
         }
+        System.out.println("h(i): " + Arrays.toString(hi));
 
         long sum = 0;
         for (i = 0; i < len; i++) {
             sum += choose(hi[i], 2);
         }
         long total = choose(len, 3);
+        System.out.println("Simplicial Depth: " + (total - sum));
+
         return (total - sum);
     }
 
@@ -155,8 +154,8 @@ public class RousseeuwAndRuts {
            merge also finds first element greater than 180
            or alpha[start] = 180
          */
-        w = new int[doubleLen];
-        gamma = new double[doubleLen];
+        w = new int[2 * len];
+        gamma = new double[2 * len];
         int i = 0, j = 0, k = 0, start = NU;
         boolean flag = false;
 

@@ -1,18 +1,6 @@
 /*
- * This file is part of ColourfulSimplicialDepthInThePlane project.
-    ColourfulSimplicialDepthInThePlane is free software: you can redistribute 
-    it and/or modify it under the terms of the GNU General Public License 
-    as published by the Free Software Foundation, either version 3 of the License, 
-    or (at your option) any later version.
-    
-    ColourfulSimplicialDepthInThePlane is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    
-    You should have received a copy of the GNU General Public License
-    along with ColourfulSimplicialDepthInThePlane. 
-    If not, see <http://www.gnu.org/licenses/>.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package colourfulsimplicialdepthintheplane;
 
@@ -39,6 +27,8 @@ public class Paint extends Applet {
         JFrame frame = new JFrame("a plot panel");
         frame.setSize(700, 700);
         plot = new Plot2DPanel();
+        plot.setFixedBounds(0, -5, 15);
+        plot.setFixedBounds(1, -5, 30);
         frame.setContentPane(plot);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -61,7 +51,7 @@ public class Paint extends Applet {
                 points[j][0] = colourSets.get(i)[j].x;
                 points[j][1] = colourSets.get(i)[j].y;
             }
-            plot.addScatterPlot("plot", colors[i], points);
+            plot.addScatterPlot("plot", colors[i % colors.length], points);
         }
         double[][] points = {{0}, {0}};
         plot.addScatterPlot("plot", Color.BLACK, points);
